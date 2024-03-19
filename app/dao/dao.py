@@ -1,4 +1,4 @@
-from sqlalchemy import delete, insert, select
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from app.database.database import async_session_maker
 
@@ -35,6 +35,24 @@ class BaseDAO:
                 print(f"Unknown Exc: Cannot insert data into table: {e}")
 
             return None
+
+    @classmethod
+    async def update(cls, username: str, **data):
+        async with async_session_maker() as session:
+            query = (
+                update(cls.model).
+                where(cls.model.username == username).
+                values(**data).
+                execution_options(synchronize_session="fetch")
+            )
+            try:
+                result = await session.execute(query)
+                await session.commit()
+                return result.rowcount
+            except (SQLAlchemyError, Exception) as e:
+                print(f"Error updating data in table {cls.model.__tablename__}: {e}")
+                await session.rollback()
+                return None
 
     @classmethod
     async def delete(cls, **filter_by):

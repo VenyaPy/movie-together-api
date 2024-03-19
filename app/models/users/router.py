@@ -1,9 +1,12 @@
-from fastapi import APIRouter, HTTPException, status, Response, Depends
+from fastapi import APIRouter, HTTPException, status, Response, Depends, UploadFile, File
 from app.models.users.model import Users
 from app.models.users.schemas import SUserReg, SUserAuth
 from app.models.users.dao import UserDAO
 from app.models.users.security import get_password_hash, authenticate_user, create_access_token
 from app.models.users.dependencies import get_current_user
+
+import uuid
+import aiofiles
 
 
 router_auth = APIRouter(
@@ -53,3 +56,33 @@ async def logout_user(response: Response):
 @router_user.get("/me")
 async def get_user_me(current_user: Users = Depends(get_current_user)):
     return current_user
+
+
+@router_user.post("/{username}/upload-photo/")
+async def upload_user_photo(username: str, file: UploadFile = File(...)):
+    user = await UserDAO.find_one_or_none(username=username)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь не найден"
+        )
+
+    file_extension = file.filename.split(".")[-1]
+    if file_extension not in ("jpg", "jpeg", "png"):
+        raise HTTPException(status_code=400, detail="Invalid file extension")
+
+    file_name = f"{uuid.uuid4()}.{file_extension}"
+    file_path = f"app/models/users/images/{file_name}"
+
+    async with aiofiles.open(file_path, 'wb') as out_file:
+        while content := await file.read(1024):
+            await out_file.write(content)
+
+    await file.seek(0)
+
+    update_result = await UserDAO.update(username=username, image=file_path)
+    if update_result == 0:
+        raise HTTPException(status_code=404, detail="Ошибка обновления данных пользователя")
+
+    return {"file_name": file_name, "file_path": file_path}
+

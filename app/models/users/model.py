@@ -10,3 +10,5 @@ class Users(Base):
     username = Column(String, nullable=False)
     email = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
+    image = Column(String, nullable=True)
+    status = Column(String, default="basic", nullable=True)
