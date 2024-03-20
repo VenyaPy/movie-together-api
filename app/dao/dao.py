@@ -37,11 +37,11 @@ class BaseDAO:
             return None
 
     @classmethod
-    async def update(cls, username: str, **data):
+    async def update(cls, id: int, **data):
         async with async_session_maker() as session:
             query = (
                 update(cls.model).
-                where(cls.model.username == username).
+                where(cls.model.id == id).
                 values(**data).
                 execution_options(synchronize_session="fetch")
             )
@@ -53,6 +53,7 @@ class BaseDAO:
                 print(f"Error updating data in table {cls.model.__tablename__}: {e}")
                 await session.rollback()
                 return None
+
 
     @classmethod
     async def delete(cls, **filter_by):

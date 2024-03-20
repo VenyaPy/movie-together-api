@@ -58,10 +58,12 @@ async def get_user_me(current_user: Users = Depends(get_current_user)):
     return current_user
 
 
-@router_user.post("/{username}/upload-photo/")
-async def upload_user_photo(username: str, file: UploadFile = File(...)):
-    user = await UserDAO.find_one_or_none(username=username)
-    if not user:
+@router_user.post("/upload-photo/")
+async def upload_user_photo(
+    current_user: Users = Depends(get_current_user),
+    file: UploadFile = File(...)
+):
+    if not current_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Пользователь не найден"
@@ -80,9 +82,11 @@ async def upload_user_photo(username: str, file: UploadFile = File(...)):
 
     await file.seek(0)
 
-    update_result = await UserDAO.update(username=username, image=file_path)
+    # Обновляем путь к файлу в профиле пользователя, используя ID, а не username
+    update_result = await UserDAO.update(id=current_user.id, image=file_path)
     if update_result == 0:
         raise HTTPException(status_code=404, detail="Ошибка обновления данных пользователя")
 
     return {"file_name": file_name, "file_path": file_path}
+
 
