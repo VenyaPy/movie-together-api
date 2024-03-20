@@ -13,4 +13,3 @@ class Movie(BaseModel):
     quality: str
     poster: HttpUrl
     trailer: str | None
-    genres: List[str] | None

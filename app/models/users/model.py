@@ -1,6 +1,6 @@
 from app.database.database import Base
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, DateTime
+from datetime import datetime
 
 
 class Users(Base):
@@ -12,3 +12,5 @@ class Users(Base):
     hashed_password = Column(String, nullable=False)
     image = Column(String, nullable=True)
     status = Column(String, default="basic", nullable=True)
+    date = Column(DateTime, default=datetime.now, nullable=False)
+
