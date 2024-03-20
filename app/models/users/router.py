@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Response, Depends, UploadFile, File
+
 from app.models.users.model import Users
 from app.models.users.schemas import SUserReg, SUserAuth
 from app.models.users.dao import UserDAO
@@ -82,11 +83,10 @@ async def upload_user_photo(
 
     await file.seek(0)
 
-    # Обновляем путь к файлу в профиле пользователя, используя ID, а не username
     update_result = await UserDAO.update(id=current_user.id, image=file_path)
     if update_result == 0:
         raise HTTPException(status_code=404, detail="Ошибка обновления данных пользователя")
 
-    return {"file_name": file_name, "file_path": file_path}
+    return {"file_name": file_name}
 
 
