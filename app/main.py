@@ -5,6 +5,7 @@ from app.database.database import engine
 from app.models.admin.router import UserAdmin
 from app.models.users.router import router_user, router_auth
 from app.models.search.router import router_search
+from app.models.admin.auth import auth_backend
 
 
 app = FastAPI(
@@ -12,7 +13,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
-admin = Admin(app, engine)
+admin = Admin(app, engine, authentication_backend=auth_backend)
 
 
 app.include_router(router_user)
