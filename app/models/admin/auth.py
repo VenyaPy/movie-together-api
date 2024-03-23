@@ -3,7 +3,7 @@ from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 from typing import Optional
-from app.models.users.security import authenticate_user, create_access_token
+from app.models.users.security import authenticate_user, create_access_token, authenticate_admin
 from app.models.users.dependencies import get_current_user
 
 
@@ -12,7 +12,7 @@ class AdminAuth(AuthenticationBackend):
         form = await request.form()
         username, password = form["username"], form["password"]
 
-        user = await authenticate_user(username, password)
+        user = await authenticate_admin(username, password)
         if user:
             access_token = create_access_token({"sub": str(user.id)})
             request.session.update({"token": access_token})
@@ -32,6 +32,7 @@ class AdminAuth(AuthenticationBackend):
         user = await get_current_user(token)
         if not user:
             return RedirectResponse(request.url_for("admin:login"), status_code=302)
+
 
 
 auth_backend = AdminAuth(secret_key="...")

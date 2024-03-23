@@ -14,9 +14,9 @@ def get_token(request: Request):
 
 async def get_current_user(token: str = Depends(get_token)):
     try:
-        payload = jwt.decode(token, " ", algorithms="HS256")
+        payload = jwt.decode(token, "venpopugorjaln204kd0", algorithms="HS256")
     except ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_423_LOCKED)
+        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="123")
     except JWTError:
         raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Токен не найден 3")
     user_id: str = payload.get("sub")
@@ -27,4 +27,6 @@ async def get_current_user(token: str = Depends(get_token)):
         raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Токен не найден 5")
 
     return user
+
+
 
