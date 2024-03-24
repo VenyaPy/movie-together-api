@@ -7,6 +7,7 @@ class Session(Base):
     __tablename__ = "sessions"
 
     id = Column(Integer, primary_key=True, index=True, nullable=False)
+    username = Column(String)
     room_id = Column(String, unique=True, index=True)
     movie_url = Column(String)
     time = Column(DateTime, nullable=False)
