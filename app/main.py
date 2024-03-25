@@ -7,6 +7,7 @@ from app.models.users.router import router_user, router_auth
 from app.models.search.router import router_search
 from app.models.admin.auth import auth_backend
 from app.models.rooms.router import room_router
+from app.images.router import image_router
 
 
 app = FastAPI(
@@ -16,9 +17,9 @@ app = FastAPI(
 
 admin = Admin(app, engine, authentication_backend=auth_backend)
 
-
 app.include_router(router_user)
 app.include_router(router_auth)
+app.include_router(image_router)
 app.include_router(router_search)
 app.include_router(room_router)
 

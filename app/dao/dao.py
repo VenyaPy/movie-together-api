@@ -68,7 +68,6 @@ class BaseDAO:
                 await session.rollback()
                 return None
 
-
     @classmethod
     async def delete(cls, **filter_by):
         async with async_session_maker() as session:
