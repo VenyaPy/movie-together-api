@@ -13,7 +13,7 @@ from app.models.search.router import router_search
 from app.models.admin.auth import auth_backend
 from app.models.rooms.router import room_router
 from app.models.images.router import image_router
-from app.models.main.router import main_router
+from app.models.mainpage.router import main_router
 
 
 app = FastAPI(

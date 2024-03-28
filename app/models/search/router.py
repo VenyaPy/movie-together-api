@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
-from fastapi_cache.decorator import cache
 
 from app.models.search.schemas import Movie, RandomMovie
-from app.models.search.apivb import fetch_movies, find_popular_films
+from app.apiconnect.apivb import fetch_movies, random_films
 from app.models.users.dependencies import get_current_user
 from app.models.users.model import Users
 
@@ -44,7 +43,7 @@ async def search_popular(current_user: Users = Depends(get_current_user)):
             detail="Вы не авторизованы"
         )
 
-    movie_data = await find_popular_films()
+    movie_data = await random_films()
     if not movie_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Неудачный запрос")
 

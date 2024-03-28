@@ -28,7 +28,7 @@ async def fetch_movies(query: str):
         return []
 
 
-async def find_popular_films():
+async def random_films():
     url = "https://api.kinopoisk.dev/v1.4/movie/random?lists=top250"
 
     headers = {
@@ -39,10 +39,9 @@ async def find_popular_films():
         async with aiohttp.ClientSession() as session:
             async with session.get(url=url, headers=headers) as response:
                 if response.status == 200:
-
                     movies = await response.json(content_type=None)
-                    movies['id'] = f"kp{movies['id']}"
 
+                    movies['id'] = f"kp{movies['id']}"
                     trailers = movies.get('videos', {}).get('trailers', [])
                     trailer_url = trailers[0].get('url')
                     movies['trailer_url'] = trailer_url
@@ -58,15 +57,19 @@ async def popular_films():
     url = "https://api.kinopoisk.dev/v1.4/movie?page=1&limit=25&lists=top250"
     headers = {
         "X-API-Key": "VBZ63SW-PFHMYEM-M3384F6-X6BXVSY",
-        "accept": "application/json"
+        "Accept": "application/json"
     }
-
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url=url, headers=headers) as response:
                 if response.status == 200:
-                    popular = await response.json(content_type=None)
-                    return popular
+                    data = await response.json(content_type=None)
+                    films_data = data.get('docs', [])
+
+                    for film in films_data:
+                        film['id'] = f"kp{film['id']}"
+
+                    return films_data
         return []
     except Exception as e:
         print(e)
