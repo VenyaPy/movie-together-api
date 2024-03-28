@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 from typing import Optional, List
 
 
@@ -13,3 +13,21 @@ class Movie(BaseModel):
     quality: str
     poster: HttpUrl
     trailer: str | None
+
+
+class RandomMovie(BaseModel):
+    id: str
+    type: str
+    name: str
+    description: str
+    year: int
+    poster: HttpUrl
+    trailer_url: HttpUrl
+
+    @validator('poster', pre=True)
+    def url_poster(cls, v):
+        return v['url']
+
+
+
+

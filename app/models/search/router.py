@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
+from fastapi_cache.decorator import cache
 
-from app.models.search.schemas import Movie
-from app.models.search.apivb import fetch_movies
+from app.models.search.schemas import Movie, RandomMovie
+from app.models.search.apivb import fetch_movies, find_popular_films
 from app.models.users.dependencies import get_current_user
 from app.models.users.model import Users
+
 
 
 router_search = APIRouter(
@@ -13,7 +15,7 @@ router_search = APIRouter(
 )
 
 
-@router_search.post("/{name}", response_model=List[Movie])
+@router_search.post("/{name}")
 async def search_film(
         name: str,
         current_user: Users = Depends(get_current_user)
@@ -31,3 +33,19 @@ async def search_film(
 
     movies = [Movie(**movie) for movie in movies_data]
     return movies
+
+
+@router_search.get("/random", response_model=RandomMovie)
+async def search_popular(current_user: Users = Depends(get_current_user)):
+
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Вы не авторизованы"
+        )
+
+    movie_data = await find_popular_films()
+    if not movie_data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Неудачный запрос")
+
+    return movie_data

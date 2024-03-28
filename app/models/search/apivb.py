@@ -26,3 +26,48 @@ async def fetch_movies(query: str):
     except Exception as e:
         print(e)
         return []
+
+
+async def find_popular_films():
+    url = "https://api.kinopoisk.dev/v1.4/movie/random?lists=top250"
+
+    headers = {
+        "X-API-Key": "VBZ63SW-PFHMYEM-M3384F6-X6BXVSY",
+        "accept": "application/json"
+    }
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url, headers=headers) as response:
+                if response.status == 200:
+
+                    movies = await response.json(content_type=None)
+                    movies['id'] = f"kp{movies['id']}"
+
+                    trailers = movies.get('videos', {}).get('trailers', [])
+                    trailer_url = trailers[0].get('url')
+                    movies['trailer_url'] = trailer_url
+
+                    return movies
+        return []
+    except Exception as e:
+        print(e)
+        return []
+
+
+async def popular_films():
+    url = "https://api.kinopoisk.dev/v1.4/movie?page=1&limit=25&lists=top250"
+    headers = {
+        "X-API-Key": "VBZ63SW-PFHMYEM-M3384F6-X6BXVSY",
+        "accept": "application/json"
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url, headers=headers) as response:
+                if response.status == 200:
+                    popular = await response.json(content_type=None)
+                    return popular
+        return []
+    except Exception as e:
+        print(e)
+        return []
